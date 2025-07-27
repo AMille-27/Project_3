@@ -1,0 +1,67 @@
+---
+title: "Modeling File"
+author: "Alise Miller"
+format: html
+editor: visual
+---
+
+## Introduction
+This project uses the 2015 BRFSS Diabetes Health Indicators data set. We will explore and model Diabetes_binary (yes or no to having diabetes) using several predictors. 
+
+```{r}
+library(caret)
+library(tidyverse)
+library(tidymodels)
+
+set.seed(22)
+diabetes_data_split <- initial_split(EDA_diabetes_data, prop = 0.70) 
+diabetes_data_training <-training (diabetes_data_split) 
+diabetes_data_test <-testing (diabetes_data_split) 
+diabetes_CV_folds <- vfold_cv(diabetes_data_training, 5)
+
+
+```
+
+## Logistic Regression Models
+### Explanation
+A logistic model is a model that can use both categorical and numeric variables, and we use it to gauge the likilood of a binary response happening. This could be something that would be yes or no, true or false kind of variable. In this case we use it to predict the likelihood of someone having diabetes, based on the variables below. A linear model would not work here because of the type of variables being used.
+Now we will create a few logistic models for the response Diabetes_binary, whether someone has diabetes or not. The first model will be based on education level, and physical health. Model 2 will be based on education level, physical health, Any healthcare coverage and income. Model 3 will be based on education level, physical health, Any healthcare coverage,income, fruit consumption.
+
+```{r}
+LR1_recipe <- recipe(Diabetes_binary_fac ~ Education_fac + PhysHlth, data = diabetes_data_training ) |>
+  step_normalize(PhysHlth)
+LR2_recipe <- recipe(Diabetes_binary_fac ~ Education_fac + PhysHlth + Health_Care_Coverage + Income, data = diabetes_data_training ) |>
+  step_normalize(PhysHlth)
+LR3_recipe <-recipe(Diabetes_binary_fac ~ Education_fac + PhysHlth + Health_Care_Coverage + Income + Fruits, data = diabetes_data_training ) |>
+  step_normalize(PhysHlth)
+
+LR_spec <- logistic_reg() |>
+  set_engine("glm")
+LR1_wkf <-workflow() |>
+  add_recipe(LR1_recipe) |>
+  add_model(LR_spec)
+LR2_wkf <-workflow() |>
+  add_recipe(LR2_recipe) |>
+  add_model(LR_spec)
+LR3_wkf <-workflow() |>
+  add_recipe(LR3_recipe) |>
+  add_model(LR_spec)
+ 
+ LR1_fit <- LR1_wkf |>
+  fit_resamples(diabetes_CV_folds, metrics = metric_set(accuracy, mn_log_loss))
+ LR2_fit <- LR2_wkf |>
+  fit_resamples(diabetes_CV_folds, metrics = metric_set(accuracy, mn_log_loss))
+ LR3_fit <- LR3_wkf |>
+  fit_resamples(diabetes_CV_folds, metrics = metric_set(accuracy, mn_log_loss))
+ 
+LR_metrics <-rbind(LR1_fit |> collect_metrics(),
+      LR2_fit |> collect_metrics(),
+      LR3_fit |> collect_metrics()) |>
+  mutate(Model = c("Model1", "Model1", "Model2", "Model2", "Model3", "Model3")) |>
+  select(Model, everything())
+
+LR_metrics
+```
+
+### Results/Choice
+According to the Logistic Regression that I just ran Model 3 would be the best because it has a lower log-loss. But Model 2 is very close behind if we only keep 3 or 4 decimals they would be approximately the same. 
