@@ -71,7 +71,7 @@ According to the Logistic Regression that I just ran Model 3 would be the best b
 
 ## Classification tree
 
-One can use a classification tree if they want an easy to interpret visual representation of the decision made. Classification trees can be used if the response variable is categorical, binary. This process took about 20 minutes for my computer to compute. ###
+One can use a classification tree if they want an easy to interpret visual representation of the decision making process. Classification trees can be used if the response variable is categorical, binary. This process took about 20 minutes for my computer to compute. ###
 
 ```{r}
 
@@ -80,7 +80,7 @@ train_tree <- diabetes_data_training |>
 test_tree <-diabetes_data_test |>
   select(-Diabetes_binary, -AnyHealthcare, -Education)
 
-tree_rec <- recipe(Diabetes_binary_fac ~., data = train_tree)
+tree_rec <- recipe(Diabetes_binary_fac ~ Education_fac + PhysHlth + Health_Care_Coverage, data = train_tree)
 
 tree_rec
 
@@ -96,7 +96,7 @@ tree_wkf <-workflow() |>
 
 tree_grid <- grid_regular(cost_complexity(),
 tree_depth(),
-levels = c(5, 3))
+levels = c(10, 5))
 
 my_metrics <- metric_set(accuracy, roc_auc, brier_class, mn_log_loss)
 
