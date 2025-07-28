@@ -6,7 +6,8 @@ editor: visual
 ---
 
 ## Introduction
-This project uses the 2015 BRFSS Diabetes Health Indicators data set. We will explore and model Diabetes_binary (yes or no to having diabetes) using several predictors. 
+
+This project uses the 2015 BRFSS Diabetes Health Indicators data set. We will explore and model Diabetes_binary (yes or no to having diabetes) using several predictors.
 
 ```{r}
 library(caret)
@@ -23,9 +24,10 @@ diabetes_CV_folds <- vfold_cv(diabetes_data_training, 5)
 ```
 
 ## Logistic Regression Models
+
 ### Explanation
-A logistic model is a model that can use both categorical and numeric variables, and we use it to gauge the likilood of a binary response happening. This could be something that would be yes or no, true or false kind of variable. In this case we use it to predict the likelihood of someone having diabetes, based on the variables below. A linear model would not work here because of the type of variables being used.
-Now we will create a few logistic models for the response Diabetes_binary, whether someone has diabetes or not. The first model will be based on education level, and physical health. Model 2 will be based on education level, physical health, Any healthcare coverage and income. Model 3 will be based on education level, physical health, Any healthcare coverage,income, fruit consumption.
+
+A logistic model is a model that can use both categorical and numeric variables, and we use it to gauge the likelihood of a binary response happening. This could be something that would be yes or no, true or false kind of variable. In this case we use it to predict the likelihood of someone having diabetes, based on the variables below. A linear model would not work here because of the type of variables being used. Now we will create a few logistic models for the response Diabetes_binary, whether someone has diabetes or not. The first model will be based on education level, and physical health. Model 2 will be based on education level, physical health, Any healthcare coverage and income. Model 3 will be based on education level, physical health, Any healthcare coverage,income, fruit consumption.
 
 ```{r}
 LR1_recipe <- recipe(Diabetes_binary_fac ~ Education_fac + PhysHlth, data = diabetes_data_training ) |>
@@ -64,4 +66,128 @@ LR_metrics
 ```
 
 ### Results/Choice
-According to the Logistic Regression that I just ran Model 3 would be the best because it has a lower log-loss. But Model 2 is very close behind if we only keep 3 or 4 decimals they would be approximately the same. 
+
+According to the Logistic Regression that I just ran Model 3 would be the best because it has a lower log-loss. But Model 2 is very close behind if we only keep 3 or 4 decimals they would be approximately the same.
+
+## Classification tree
+
+One can use a classification tree if they want an easy to interpret visual representation of the decision made. Classification trees can be used if the response variable is categorical, binary. This process took about 20 minutes for my computer to compute. ###
+
+```{r}
+
+train_tree <- diabetes_data_training |>
+  select(-Diabetes_binary, -AnyHealthcare, -Education)
+test_tree <-diabetes_data_test |>
+  select(-Diabetes_binary, -AnyHealthcare, -Education)
+
+tree_rec <- recipe(Diabetes_binary_fac ~., data = train_tree)
+
+tree_rec
+
+tree_mod <- decision_tree( tree_depth = tune(),
+ min_n = 20, 
+ cost_complexity = tune()) |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+tree_wkf <-workflow() |>
+  add_recipe(tree_rec) |>
+  add_model(tree_mod)
+
+tree_grid <- grid_regular(cost_complexity(),
+tree_depth(),
+levels = c(5, 3))
+
+my_metrics <- metric_set(accuracy, roc_auc, brier_class, mn_log_loss)
+
+tree_fits <- tree_wkf |> 
+  tune_grid(resamples = diabetes_CV_folds,
+                grid = tree_grid,
+            metrics = my_metrics)
+tree_fits
+
+tree_fits |>
+  collect_metrics()
+
+tree_fits %>%
+  collect_metrics() %>%
+  mutate(tree_depth = factor(tree_depth)) %>%
+  ggplot(aes(cost_complexity, mean, color = tree_depth)) +
+  geom_line(size = 1.5, alpha = 0.6) +
+  geom_point(size = 2) +
+  facet_wrap(~ .metric, scales = "free", nrow = 2) +
+  scale_x_log10(labels = scales::label_number()) +
+  scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
+
+tree_fits |>
+  collect_metrics() |>
+  filter(.metric == "mn_log_loss") |>
+  arrange(mean)
+tree_best_params <- select_best(tree_fits, metric = "mn_log_loss")
+
+tree_best_params
+
+tree_final_wkf <- tree_wkf |>
+  finalize_workflow(tree_best_params)
+
+tree_final_fit <- tree_final_wkf |>
+  last_fit(diabetes_data_split)
+
+tree_final_fit
+
+tree_final_fit |>
+  collect_metrics()
+
+tree_final_model <- extract_workflow(tree_final_fit) 
+tree_final_model
+
+tree_final_model %>%
+  extract_fit_engine() %>%
+  rpart.plot::rpart.plot(roundint = FALSE)
+```
+
+## Random Forest
+
+### Explanation
+A Random Forest is a type of ensemble  creates multiple trees from bootstrap samples. Each tree is trained on a small sample size of predictors in hopes to reduce overfitting. Then it averages results in some way for a final prediction. Random forest could be used if you are not interested in testing all of the predictors but you do have a mix of categorical and quantitative variables. Random forest should also be considered if you are less concerned about interpretation of individual predictors. 
+
+```{r}
+library(parsnip)
+library(rpart)
+library(ranger)
+library(tidymodels)
+
+rf_spec <- rand_forest(mtry = tune(), trees =  60, min_n = 20) |>
+  set_engine("ranger") |>
+  set_mode("classification")
+```
+
+```{r}
+rf_wkf <- workflow() |>
+  add_recipe(tree_rec) |>
+  add_model(rf_spec)
+
+rf_fit <-rf_wkf |>
+  tune_grid(
+    resamples = diabetes_CV_folds,
+    grid = 2, 
+    metrics = my_metrics)
+```
+
+```{r}
+rf_fit |>
+  collect_metrics() |> 
+  filter(.metric == "mn_log_loss") |>
+  arrange(mean)
+
+rf_best_params <- select_best(rf_fit, metric ="mn_log_loss")
+
+rf_final_wk <- finalize_workflow(rf_wkf, rf_best_params)
+
+rf_final_fit <- rf_final_wk |>
+  last_fit(diabetes_data_split, metrics = metric_set(accuracy, mn_log_loss))
+
+rf_final_fit |> collect_metrics()
+```
+
+
