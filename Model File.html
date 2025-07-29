@@ -231,7 +231,7 @@ dbl (22): Diabetes_binary, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke,...
 </section>
 <section id="classification-tree" class="level2">
 <h2 class="anchored" data-anchor-id="classification-tree">Classification tree</h2>
-<p>A classification tree is a type of decision tree when the response variable is categorical, binary. In our case subject has diabetes yes or no. It works by using certain rules to repeatedly split the training data into smaller sections. Each time the data is split a new branch is made. This process is continued until certain conditions are met based on the rule the machine is using. To make it so the tree wouldn’t grow too large and overfitting the training set we use a cost_complexity parameter. One can use a classification tree if they want an easy to interpret visual representation of the decision making process. Classification trees can be used if the response variable is categorical, binary. For this I used Level of education, number of poor physical health days in the a month, and health care coverage as the predictors for having diabetes or not.</p>
+<p>A classification tree is a type of decision tree where the response variable is categorical, binary. In our case subject has diabetes yes or no. It works by using certain rules to repeatedly split the training data into smaller sections. Each time the data is split a new branch is made. This process is continued until certain conditions are met based on the rule the machine is using. To make it so the tree wouldn’t grow too large and overfitting the training set we use a cost_complexity parameter. One can use a classification tree if they want an easy to interpret visual representation of the decision making process. Classification trees can be used if the response variable is categorical, binary. For this I used Level of education, number of poor physical health days in the a month, and health care coverage as the predictors for having diabetes or not.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>train_tree <span class="ot">&lt;-</span> diabetes_data_training <span class="sc">|&gt;</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>Diabetes_binary, <span class="sc">-</span>AnyHealthcare, <span class="sc">-</span>Education)</span>
@@ -436,7 +436,7 @@ node), split, n, loss, yval, (yprob)
 </div>
 <section id="results" class="level3">
 <h3 class="anchored" data-anchor-id="results">Results</h3>
-<p>The tree starts off by asking if a person has less than 7.5 days of poor physical health. If the answer is yes we go left and if the answer is no we go right. The left sides predicts no diabetes, with 84% of all observations that took this path resulted in no diabetes. And the tree continues for people who had more than 7.5 days of poor health days to ask Education level: some college/college grad. If yes we again go to the left and if no then to the right and the tree continues. The left side means of all the observation that had some college/college grad 9% were predicted to not have diabetes. The tree goes on to split into education level high school grad, Health care coverage, education level none/some high school, poor physical health days less than 17, poor physical health days greater than or equal to 13, poor physical health days less than 8.5, poor physical health days less than 11, and lastly poor physical health days greater than or equal to 25.</p>
+<p>The tree begins by asking if a person has had less than 7.5 days of poor physical health. If the answer is yes, we go left, and if the answer is no, we go right. The left side predicts no diabetes, with 84% of all observations that took this path resulting in no diabetes. And the tree continues for people who had more than 7.5 days of poor health days to ask Education level: some college/college grad. If yes, we again go to the left, and if no, then to the right, and the tree continues. The left side means that of all the observations that had some college/college grad 9% were predicted not to have diabetes. The tree goes on to split into education level high school grad, Health care coverage, education level none/some high school, poor physical health days less than 17, poor physical health days greater than or equal to 13, poor physical health days less than 8.5, poor physical health days less than 11, and lastly poor physical health days greater than or equal to 25.</p>
 </section>
 </section>
 <section id="random-forest" class="level2">
@@ -498,6 +498,132 @@ node), split, n, loss, yval, (yprob)
 </section>
 <section id="results-1" class="level3">
 <h3 class="anchored" data-anchor-id="results-1">Results</h3>
+<p>After fitting the random forest model, I tuned with mtry and min_n.&nbsp;I collected the metrics of accuracy and log loss. The best model had an mtry of 2 with a log loss of 0.384.</p>
+</section>
+</section>
+<section id="final-model-selection" class="level2">
+<h2 class="anchored" data-anchor-id="final-model-selection">Final Model Selection</h2>
+<section id="logistic-regression-model" class="level3">
+<h3 class="anchored" data-anchor-id="logistic-regression-model">Logistic Regression Model</h3>
+<p>Below is the testing of the third Logistic Regression model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a> LR3_wkf <span class="sc">|&gt;</span> </span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">last_fit</span>(diabetes_data_split,</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, mn_log_loss)) <span class="sc">|&gt;</span> </span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  .metric     .estimator .estimate .config             
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy    binary         0.860 Preprocessor1_Model1
+2 mn_log_loss binary         0.383 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>The log loss on the test data set is 0.383, while the log loss on the trained data was 0.380. This shows that the model was consistent in predicting the test set. We should be good to use it on other unused data.</p>
+</section>
+<section id="classification-tree-1" class="level3">
+<h3 class="anchored" data-anchor-id="classification-tree-1">Classification Tree</h3>
+<p>I already ran the prediction on the test set above for the Classification Tree, but here it is again.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>tree_final_wkf <span class="ot">&lt;-</span> tree_wkf <span class="sc">|&gt;</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(tree_best_params)</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>tree_final_fit <span class="ot">&lt;-</span> tree_final_wkf <span class="sc">|&gt;</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">last_fit</span>(diabetes_data_split, <span class="at">metrics =</span> my_metrics)</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>tree_final_fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Resampling results
+# Manual resampling 
+# A tibble: 1 × 6
+  splits                 id            .metrics .notes   .predictions .workflow 
+  &lt;list&gt;                 &lt;chr&gt;         &lt;list&gt;   &lt;list&gt;   &lt;list&gt;       &lt;list&gt;    
+1 &lt;split [177576/76104]&gt; train/test s… &lt;tibble&gt; &lt;tibble&gt; &lt;tibble&gt;     &lt;workflow&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>tree_final_fit <span class="sc">|&gt;</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 4
+  .metric     .estimator .estimate .config             
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy    binary         0.860 Preprocessor1_Model1
+2 roc_auc     binary         0.584 Preprocessor1_Model1
+3 brier_class binary         0.117 Preprocessor1_Model1
+4 mn_log_loss binary         0.394 Preprocessor1_Model1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>tree_final_model <span class="ot">&lt;-</span> <span class="fu">extract_workflow</span>(tree_final_fit) </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>tree_final_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow [trained] ══════════════════════════════════════════════════════════
+Preprocessor: Recipe
+Model: decision_tree()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+0 Recipe Steps
+
+── Model ───────────────────────────────────────────────────────────────────────
+n= 177576 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+   1) root 177576 24691 No (0.8609553 0.1390447)  
+     2) PhysHlth&lt; 7.5 148926 16928 No (0.8863328 0.1136672) *
+     3) PhysHlth&gt;=7.5 28650  7763 No (0.7290401 0.2709599)  
+       6) Education_fac=Some_College,College_Grad 16575  4007 No (0.7582504 0.2417496) *
+       7) Education_fac=None,Elementary,Some_HS,HS_Grad 12075  3756 No (0.6889441 0.3110559)  
+        14) Education_fac=HS_Grad 9009  2652 No (0.7056277 0.2943723) *
+        15) Education_fac=None,Elementary,Some_HS 3066  1104 No (0.6399217 0.3600783)  
+          30) Health_Care_Coverage=No 321    77 No (0.7601246 0.2398754) *
+          31) Health_Care_Coverage=Yes 2745  1027 No (0.6258652 0.3741348)  
+            62) Education_fac=None,Some_HS 1913   681 No (0.6440146 0.3559854) *
+            63) Education_fac=Elementary 832   346 No (0.5841346 0.4158654)  
+             126) PhysHlth&lt; 16.5 232    82 No (0.6465517 0.3534483)  
+               252) PhysHlth&gt;=12.5 121    38 No (0.6859504 0.3140496) *
+               253) PhysHlth&lt; 12.5 111    44 No (0.6036036 0.3963964)  
+                 506) PhysHlth&lt; 8.5 18     5 No (0.7222222 0.2777778) *
+                 507) PhysHlth&gt;=8.5 93    39 No (0.5806452 0.4193548)  
+                  1014) PhysHlth&lt; 11 82    33 No (0.5975610 0.4024390) *
+                  1015) PhysHlth&gt;=11 11     5 Yes (0.4545455 0.5454545) *
+             127) PhysHlth&gt;=16.5 600   264 No (0.5600000 0.4400000)  
+               254) PhysHlth&gt;=24.5 504   213 No (0.5773810 0.4226190) *
+               255) PhysHlth&lt; 24.5 96    45 Yes (0.4687500 0.5312500) *</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>tree_final_model <span class="sc">%&gt;%</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  rpart.plot<span class="sc">::</span><span class="fu">rpart.plot</span>(<span class="at">roundint =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Model-File_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The log loss for the trained data was 0.389 and the log loss for the tested set was 0.394. It seems that the model was pretty consistent in predicting the on the test data. I will note that the 0.394 is slightly less confident.</p>
+</section>
+<section id="random-forest-1" class="level3">
+<h3 class="anchored" data-anchor-id="random-forest-1">Random Forest</h3>
+<p>I already ran the prediction on the test set above for the Random Forest model, but here it is again.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>rf_final_fit <span class="ot">&lt;-</span> rf_final_wk <span class="sc">|&gt;</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">last_fit</span>(diabetes_data_split, <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, mn_log_loss))</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>rf_final_fit <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  .metric     .estimator .estimate .config             
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy    binary         0.860 Preprocessor1_Model1
+2 mn_log_loss binary         0.387 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>This shows that when the best model from the trained set is now used on the tested set the log loss is 0.387 and the accuracy is 0.860 while the trained data set had a log loss of 0.384. These numbers align with the results of the training set. I would move to say this is a good model.</p>
+</section>
+<section id="the-winner" class="level3">
+<h3 class="anchored" data-anchor-id="the-winner">The WINNER</h3>
+<p>This is a tough to decide. The winner I choose is Logistic Regression model. Here are the things I considered while making this decision. Random Forest model training and test set log loss are only 0.003 from each other, but interpreting the model could prove to be challenging. But Random Forest tend to be highly accurate models. And from this project experience they tend to take more time. While interpreting the classification tree is easier, the log loss metrics for the test and training are the furthest away from each other at 0.005. And classification trees tend to be less accurate models. Logistic Regression model training and test sets log losses are also 0.003 from each other. But logistic regression do not work well with non linear data. Looking at another metric, accuracy on the test set, both Classification Tree and Logistic regression model have an accuracy of 0.860. To no surprise Random Forest has a higher accuracy of 0.865.</p>
+<p><a href="EDA.html">Click here to return to EDA Page</a></p>
 </section>
 </section>
 
