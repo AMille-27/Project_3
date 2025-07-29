@@ -40,3 +40,34 @@ LR3_wkf <-workflow() |>
 final_model <- LR3_wkf |>
   fit(EDA_diabetes_data)
 tidy(final_model)
+
+
+#* Predicts the likelihood of Diabetes
+#* @param Education_fac level of education
+#* @param PhysHlth number of poor health days of 30
+#* @param Health_Care_Coverage Insured or not
+#* @param Income Income level 
+#* @param Fruits Whether fruit as been consumed recently
+#* @get /pred
+function(Education_fac = "College_Grad", PhysHlth = 4, 
+         Health_Care_Coverage = "Yes", Income = "$75k or more", Fruits = "Yes"){
+  APIdata <-tibble(
+    Education_fac = Education_fac,
+    PhysHlth  = as.numeric(PhysHlth),
+    Health_Care_Coverage = Health_Care_Coverage,
+    Income = Income,
+    Fruits = Fruits
+  )
+  predict(final_model, new_data = APIdata, type= "prob")
+}
+
+# Examples
+#http://127.0.0.1:9379/pred?Education_fac=Some_College&PhysHlth=5&Health_Care_Coverage=Yes&Income=$75k%20or%20more&Fruits=Yes
+#http://127.0.0.1:9379/pred?Education_fac=College_Grad&PhysHlth=5&Health_Care_Coverage=Yes&Income=10k-$15k&Fruits=No
+#http://127.0.0.1:9379/pred?Education_fac=None&PhysHlth=25&Health_Care_Coverage=No&Income=less%20than%2010k&Fruits=No
+
+
+#* @get /info
+function(){
+"Alise M"
+}
