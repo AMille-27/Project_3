@@ -10,9 +10,10 @@ editor: visual
 This project uses the 2015 BRFSS Diabetes Health Indicators data set. We will explore and model Diabetes_binary (yes or no to having diabetes) using several predictors.
 
 ```{r}
-library(caret)
-library(tidyverse)
-library(tidymodels)
+suppressPackageStartupMessages(library(caret))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(tidymodels))
+
 
 set.seed(22)
 diabetes_data_split <- initial_split(EDA_diabetes_data, prop = 0.70) 
@@ -71,7 +72,7 @@ According to the Logistic Regression that I just ran Model 3 would be the best b
 
 ## Classification tree
 
-One can use a classification tree if they want an easy to interpret visual representation of the decision making process. Classification trees can be used if the response variable is categorical, binary. This process took about 20 minutes for my computer to compute. ###
+A classification tree is a type of decision tree when the response variable is categorical, binary. In our case subject has diabetes yes or no. It works by using certain rules to repeatedly split the training data into smaller sections. Each time the data is split a new branch is made. This process is continued until certain conditions are met based on the rule the machine is using. To make it so the tree wouldn't grow too large and overfitting the training set we use a cost_complexity parameter.  One can use a classification tree if they want an easy to interpret visual representation of the decision making process. Classification trees can be used if the response variable is categorical, binary. For this I used Level of education, number of poor physical health days in the a month, and health care coverage as the predictors for having diabetes or not. 
 
 ```{r}
 
@@ -146,23 +147,25 @@ tree_final_model %>%
   rpart.plot::rpart.plot(roundint = FALSE)
 ```
 
+### Results
+
+The tree starts off by asking if a person has less than 7.5 days of poor physical health. If the answer is yes we go left and if the answer is no we go right. The left sides predicts no diabetes, with 84% of all observations that took this path resulted in no diabetes. And the tree continues for people who had more than 7.5 days of poor health days to ask Education level: some college/college grad. If yes we again go to the left and if no then to the right and the tree continues. The left side means of all the observation that had some college/college grad 9% were predicted to not have diabetes. The tree goes on to split into education level high school grad, Health care coverage, education level none/some high school, poor physical health days less than 17,  poor physical health days greater than or equal to 13, poor physical health days less than 8.5,  poor physical health days less than 11, and lastly  poor physical health days greater than or equal to 25. 
+
 ## Random Forest
 
 ### Explanation
-A Random Forest is a type of ensemble  creates multiple trees from bootstrap samples. Each tree is trained on a small sample size of predictors in hopes to reduce overfitting. Then it averages results in some way for a final prediction. Random forest could be used if you are not interested in testing all of the predictors but you do have a mix of categorical and quantitative variables. Random forest should also be considered if you are less concerned about interpretation of individual predictors. 
+A Random Forest is a type of ensemble tree that  creates multiple trees from bootstrap samples. Each tree is trained on a small sample size of predictors in hopes to reduce overfitting. So it makes a tree diagram gets the results of that tree using the training data, then it repeats the process as many times as required. Then it averages results in some way for a final prediction. Random forest could be used if you are not interested in testing all of the predictors but you do have a mix of categorical and quantitative variables. Random forest should also be considered if you are less concerned about interpretation of individual predictors. 
 
 ```{r}
-library(parsnip)
-library(rpart)
-library(ranger)
-library(tidymodels)
+suppressPackageStartupMessages(library(parsnip))
+suppressPackageStartupMessages(library(rpart))
+suppressPackageStartupMessages(library(ranger))
 
-rf_spec <- rand_forest(mtry = tune(), trees =  60, min_n = 20) |>
+
+rf_spec <- rand_forest(mtry = tune(), trees = 800, min_n = 20) |>
   set_engine("ranger") |>
   set_mode("classification")
-```
 
-```{r}
 rf_wkf <- workflow() |>
   add_recipe(tree_rec) |>
   add_model(rf_spec)
@@ -170,11 +173,9 @@ rf_wkf <- workflow() |>
 rf_fit <-rf_wkf |>
   tune_grid(
     resamples = diabetes_CV_folds,
-    grid = 2, 
+    grid = 4, 
     metrics = my_metrics)
-```
 
-```{r}
 rf_fit |>
   collect_metrics() |> 
   filter(.metric == "mn_log_loss") |>
@@ -190,4 +191,4 @@ rf_final_fit <- rf_final_wk |>
 rf_final_fit |> collect_metrics()
 ```
 
-
+### Results
