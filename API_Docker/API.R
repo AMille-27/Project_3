@@ -29,7 +29,7 @@ EDA_diabetes_data<- EDA_diabetes_data |> mutate(Education_fac = factor(Education
       DiffWalk = factor(DiffWalk, levels = c(0, 1), labels = c("No","Yes"))
 )
 
-LR3_recipe <-recipe(Diabetes_binary_fac ~ Education_fac + PhysHlth + Health_Care_Coverage + Income + Fruits, data = diabetes_data_training ) |>
+LR3_recipe <-recipe(Diabetes_binary_fac ~ Education_fac + PhysHlth + Health_Care_Coverage + Income + Fruits, data = EDA_diabetes_data ) |>
   step_normalize(PhysHlth)
 LR_spec <- logistic_reg() |>
   set_engine("glm")
@@ -59,9 +59,14 @@ function(Education_fac = "College_Grad", PhysHlth = 4,
     Fruits = Fruits
   )
   predict(final_model, new_data = APIdata, type= "prob")
-}
+  }
 
 # Examples
+#After Docker
+#http://127.0.0.1:8000/pred?Education_fac=Some_College&PhysHlth=18&Health_Care_Coverage=Yes&Income=%2475k%20or%20more&Fruits=Yes
+#http://127.0.0.1:8000/pred?Education_fac=Some_College&PhysHlth=18&Health_Care_Coverage=No&Income=%2475k%20or%20more&Fruits=No
+#http://127.0.0.1:8000/pred?Education_fac=None&PhysHlth=30&Health_Care_Coverage=No&Income=less%20than%20%2410k&Fruits=No
+#Before Docker
 #http://127.0.0.1:9379/pred?Education_fac=Some_College&PhysHlth=5&Health_Care_Coverage=Yes&Income=$75k%20or%20more&Fruits=Yes
 #http://127.0.0.1:9379/pred?Education_fac=College_Grad&PhysHlth=5&Health_Care_Coverage=Yes&Income=10k-$15k&Fruits=No
 #http://127.0.0.1:9379/pred?Education_fac=None&PhysHlth=25&Health_Care_Coverage=No&Income=less%20than%2010k&Fruits=No
@@ -69,5 +74,5 @@ function(Education_fac = "College_Grad", PhysHlth = 4,
 
 #* @get /info
 function(){
-"Alise M"
+"Alise M link:https://amille-27.github.io/Project_3/"
 }
