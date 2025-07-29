@@ -58,24 +58,61 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="Model File_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Model File_files/libs/quarto-html/quarto.js"></script>
-<script src="Model File_files/libs/quarto-html/popper.min.js"></script>
-<script src="Model File_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="Model File_files/libs/quarto-html/anchor.min.js"></script>
-<link href="Model File_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Model File_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="Model File_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="Model File_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Model File_files/libs/bootstrap/bootstrap-1bc8a17f135ab3d594c857e9f48e611b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d4be639c637f3db3c684c66cefad7e0c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
 
 
 </head>
 
 <body class="fullcontent">
 
-<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -624,11 +661,12 @@ node), split, n, loss, yval, (yprob)
 <h3 class="anchored" data-anchor-id="the-winner">The WINNER</h3>
 <p>This is a tough to decide. The winner I choose is Logistic Regression model. Here are the things I considered while making this decision. Random Forest model training and test set log loss are only 0.003 from each other, but interpreting the model could prove to be challenging. But Random Forest tend to be highly accurate models. And from this project experience they tend to take more time. While interpreting the classification tree is easier, the log loss metrics for the test and training are the furthest away from each other at 0.005. And classification trees tend to be less accurate models. Logistic Regression model training and test sets log losses are also 0.003 from each other. But logistic regression do not work well with non linear data. Looking at another metric, accuracy on the test set, both Classification Tree and Logistic regression model have an accuracy of 0.860. To no surprise Random Forest has a higher accuracy of 0.865.</p>
 <p><a href="EDA.html">Click here to return to EDA Page</a></p>
+
+
 </section>
 </section>
 
-</main>
-<!-- /main column -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

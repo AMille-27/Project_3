@@ -122,5 +122,5 @@ table(EDA_diabetes_data$Health_Care_Coverage)
 
 
 
- [Click here for the Modeling Page](Modeling File.html)
+ [Click here for the Modeling Page](Model File.html)
 
