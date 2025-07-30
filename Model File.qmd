@@ -7,7 +7,7 @@ editor: visual
 
 ## Introduction
 
-This project uses the 2015 BRFSS Diabetes Health Indicators data set. We will explore and model Diabetes_binary (yes or no to having diabetes) using several predictors.
+This project uses the 2015 BRFSS Diabetes Health Indicators data set. We will explore and model Diabetes_binary (yes or no to having diabetes) with logistic regression model, classification trees, and random forest. The predictors include: Education, Income, Fruits, Physical Health and Health Care Coverage. Some of these predictors ahve a stronger impact than others. We will then decide the best model and have some discussion. 
 
 ```{r}
 suppressPackageStartupMessages(library(caret))
