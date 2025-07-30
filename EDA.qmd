@@ -7,7 +7,7 @@ editor: visual
 
 ## Introduction
 
-This project uses the 2015 BRFSS Diabetes Health Indicators data set. This page will be an exploration of the predictors physical health, Education, and health care coverage impact on the response Diabetes_binary, which identifies whether a person has diabetes or not. These variables were chosen based on their potential relationship to diabetes risk, as explore in this EDA. I want to later be able to model/predict the prevalence of diabetes with based on these variables/predictors.
+This project uses the 2015 BRFSS Diabetes Health Indicators data set. This page will be an exploration of the predictors physical health, Education, and health care coverage impact on the response Diabetes_binary, which identifies whether a person has diabetes or not. These variables were chosen based on their potential relationship to diabetes risk, as exploration in this EDA. The ultimate goal of this EDA is to see which predictors are useful and get some conjectures formed. I want to later be able to model/predict the prevalence of diabetes with based on these variables/predictors.
 
 ## Data
 
